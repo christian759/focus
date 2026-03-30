@@ -90,20 +90,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen()));
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.menu_rounded, size: 16, color: Colors.black),
                             ),
-                            child: const Icon(Icons.menu_rounded, size: 16, color: Colors.black),
                           ),
-                          Row(
-                            children: [
-                              const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
-                              const SizedBox(width: 4),
-                              Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                            ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen()));
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
+                                const SizedBox(width: 4),
+                                Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                              ],
+                            ),
                           )
                         ],
                       ).animate().fadeIn().slideX(begin: -0.2),
@@ -195,7 +205,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
 
                 SliverToBoxAdapter(
-                  child: Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      TextButton(
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen())),
+                        child: Text('View Details', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 14)),
+                      ),
+                    ],
+                  ),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.only(top: 16.0, bottom: 100.0),
