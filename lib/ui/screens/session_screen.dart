@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/focus_provider.dart';
+import '../../features/dnd/dnd_service.dart';
 import 'result_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
@@ -38,9 +39,10 @@ class SessionScreen extends ConsumerWidget {
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Stay focused')),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  await DndService.turnOffDnd();
                   ref.read(focusProvider.notifier).failSession();
-                  Navigator.pop(context, true);
+                  if (context.mounted) Navigator.pop(context, true);
                 },
                 child: const Text('Quit', style: TextStyle(color: AppColors.error)),
               ),

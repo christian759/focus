@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
+import '../../features/dnd/dnd_service.dart';
 import '../../models/session.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
@@ -18,6 +19,16 @@ class ResultScreen extends ConsumerStatefulWidget {
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _turnOffDnd();
+  }
+
+  Future<void> _turnOffDnd() async {
+    await DndService.turnOffDnd();
+  }
 
   @override
   void dispose() {

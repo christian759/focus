@@ -4,105 +4,217 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
+import '../../features/todo/todo_provider.dart';
+import '../../features/user/user_provider.dart';
 import 'session_screen.dart';
-import 'stats_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
 import 'create_focus_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkUserName();
+    });
+  }
+
+  void _checkUserName() {
+    final userName = ref.read(userProvider);
+    if (userName.isEmpty) {
+      _showNameDialog();
+    }
+  }
+
+  void _showNameDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.cardBackground,
+          title: Text('Welcome!', style: GoogleFonts.playfairDisplay(color: Colors.white)),
+          content: TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'What is your name?',
+              hintStyle: TextStyle(color: Colors.white38),
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  ref.read(userProvider.notifier).setName(controller.text.trim());
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Continue'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userName = ref.watch(userProvider);
+    final streak = ref.watch(streakProvider);
+    final sessions = ref.watch(sessionHistoryProvider);
+    final todos = ref.watch(todoProvider);
+
     return Scaffold(
       body: PremiumBackground(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.menu_rounded, size: 16, color: Colors.black),
-                    ),
-                  ],
-                ).animate().fadeIn().slideX(begin: -0.2),
-                const SizedBox(height: 40),
-                Text(
-                  'Good morning,',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.normal,
-                    color: Colors.white70,
-                  ),
-                ),
-                Text(
-                  'Theresa',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontSize: 40,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                
-                // Tip Card
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.lightbulb_outline, color: AppColors.primary, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'You focus best in the mornings',
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.menu_rounded, size: 16, color: Colors.black),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.local_fire_department, color: AppColors.primary, size: 24),
+                              const SizedBox(width: 4),
+                              Text('${streak.currentStreak}', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                            ],
+                          )
+                        ],
+                      ).animate().fadeIn().slideX(begin: -0.2),
+                      const SizedBox(height: 40),
+                      Text(
+                        'Good morning,',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white70,
                         ),
                       ),
                       Text(
-                        'Plan better with Aura',
-                        style: GoogleFonts.inter(color: Colors.white38, fontSize: 11),
+                        userName.isNotEmpty ? userName : 'Friend',
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          fontSize: 40,
+                        ),
                       ),
+                      const SizedBox(height: 32),
+                      
+                      // Tip Card
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.lightbulb_outline, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'You focus best in the mornings',
+                                style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: 200.ms),
+                      const SizedBox(height: 32),
                     ],
                   ),
-                ).animate().fadeIn(delay: 200.ms),
+                ),
                 
-                const SizedBox(height: 32),
+                // Tabs for Todo and History
+                SliverToBoxAdapter(
+                  child: Text('To-Do List', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
                 
-                // Focus Grid
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    children: [
-                      _buildFocusCard(context, '45', 'Certification preparation at ne..'),
-                      _buildFocusCard(context, '30', 'Read Atomic Habits.'),
-                      _buildFocusCard(context, '60', 'UI Design Session', isLarge: true),
-                    ],
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final todo = todos[index];
+                      return CheckboxListTile(
+                        value: todo.isCompleted,
+                        title: Text(todo.title, style: TextStyle(color: Colors.white, decoration: todo.isCompleted ? TextDecoration.lineThrough : null)),
+                        onChanged: (_) => ref.read(todoProvider.notifier).toggleTodo(todo.id),
+                        controlAffinity: ListTileControlAffinity.leading,
+                        checkColor: Colors.black,
+                        activeColor: AppColors.primary,
+                        secondary: IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.white38),
+                          onPressed: () => ref.read(todoProvider.notifier).deleteTodo(todo.id),
+                        ),
+                      );
+                    },
+                    childCount: todos.length,
+                  ),
+                ),
+                
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+                    child: TextField(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Add a new task...',
+                        hintStyle: const TextStyle(color: Colors.white38),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.05),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      onSubmitted: (val) {
+                        ref.read(todoProvider.notifier).addTodo(val);
+                      },
+                    ),
+                  ),
+                ),
+
+                SliverToBoxAdapter(
+                  child: Text('Recent Sessions', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: 16.0, bottom: 100.0),
+                  sliver: SliverGrid(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final reversedSessions = sessions.reversed.toList();
+                        final isLarge = index == 0;
+                        final duration = (reversedSessions[index].durationSeconds ~/ 60).toString();
+                        final title = reversedSessions[index].outputText.isEmpty ? 'Focus Session' : reversedSessions[index].outputText;
+                        return _buildFocusCard(context, duration, title, isLarge: isLarge);
+                      },
+                      childCount: sessions.length > 4 ? 4 : sessions.length,
+                    ),
                   ),
                 ),
               ],

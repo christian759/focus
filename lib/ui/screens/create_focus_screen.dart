@@ -6,6 +6,7 @@ import '../widgets/premium_background.dart';
 import '../widgets/duration_picker_3d.dart';
 import 'package:focus/core/theme.dart';
 import '../../features/focus/focus_provider.dart';
+import '../../features/dnd/dnd_service.dart';
 import 'session_screen.dart';
 
 class CreateFocusScreen extends ConsumerStatefulWidget {
@@ -123,15 +124,27 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final granted = await DndService.requestDndPermission(context);
+                          if (granted) {
+                            await DndService.turnOnDnd();
+                          }
+                          ref.read(focusProvider.notifier).startSession(_selectedMinutes);
+                          if (context.mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SessionScreen()),
+                            );
+                          }
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           side: const BorderSide(color: Colors.white24),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
                         ),
                         child: Text(
-                          'Create with Laura',
-                          style: GoogleFonts.inter(color: AppColors.primary, fontWeight: FontWeight.bold),
+                          'Deep Focus (DND)',
+                          style: GoogleFonts.inter(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                       ),
                     ),
