@@ -133,27 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(height: 32),
                       
-                      // Tip Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.lightbulb_outline, color: AppColors.primary, size: 20),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'You focus best in the mornings',
-                                style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).animate().fadeIn(delay: 200.ms),
-                      const SizedBox(height: 32),
+
                     ],
                   ),
                 ),

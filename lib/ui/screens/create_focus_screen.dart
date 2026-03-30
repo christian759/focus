@@ -78,46 +78,7 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                   },
                 ),
                 
-                const Spacer(flex: 1),
-                
-                // Long term focus option
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.glassBackground,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Create a long term focus',
-                              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              'Add repeat, due date and more',
-                              style: GoogleFonts.inter(color: Colors.white38, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.north_east_rounded, size: 16),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
-                
-                const SizedBox(height: 40),
+
                 
                 // Action Buttons
                 Row(
