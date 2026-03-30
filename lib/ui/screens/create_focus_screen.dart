@@ -25,10 +25,17 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
     return Scaffold(
       body: PremiumBackground(
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        children: [
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
@@ -126,8 +133,13 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                 ).animate().fadeIn(delay: 400.ms),
                 
                 const SizedBox(height: 20),
-              ],
-            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

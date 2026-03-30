@@ -54,9 +54,16 @@ class SessionScreen extends ConsumerWidget {
       child: Scaffold(
         body: PremiumBackground(
           child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                 const Spacer(flex: 2),
                 Text(
                   'Current focus',
@@ -112,7 +119,12 @@ class SessionScreen extends ConsumerWidget {
                   ),
                 ).animate().fadeIn(delay: 1.seconds),
                 const SizedBox(height: 40),
-              ],
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

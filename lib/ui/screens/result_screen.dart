@@ -68,11 +68,18 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     return Scaffold(
       body: PremiumBackground(
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                 const Spacer(flex: 1),
                 Icon(
                   isSuccess ? Icons.auto_awesome : Icons.error_outline_rounded,
@@ -137,8 +144,13 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   ),
                 ).animate().fadeIn(delay: 900.ms),
                 const SizedBox(height: 20),
-              ],
-            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
