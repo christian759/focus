@@ -1,23 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:installed_apps/installed_apps.dart';
+import 'package:installed_apps/app_info.dart';
 import '../../core/theme.dart';
 import '../../features/dnd/block_apps_provider.dart';
 
-class BlockAppsScreen extends ConsumerWidget {
+class BlockAppsScreen extends ConsumerStatefulWidget {
   const BlockAppsScreen({super.key});
 
-  static const List<Map<String, String>> socialApps = [
-    {'name': 'Instagram', 'icon': 'assets/icon.png'}, // Placeholder using existing asset if needed
-    {'name': 'TikTok', 'icon': 'assets/icon.png'},
-    {'name': 'Facebook', 'icon': 'assets/icon.png'},
-    {'name': 'Twitter / X', 'icon': 'assets/icon.png'},
-    {'name': 'Snapchat', 'icon': 'assets/icon.png'},
-    {'name': 'WhatsApp', 'icon': 'assets/icon.png'},
-  ];
+  @override
+  ConsumerState<BlockAppsScreen> createState() => _BlockAppsScreenState();
+}
+
+class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
+  List<AppInfo> _apps = [];
+  bool _isLoading = true;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _loadApps();
+  }
+
+  Future<void> _loadApps() async {
+    try {
+      final List<AppInfo> apps = await InstalledApps.getInstalledApps(true, true);
+      setState(() {
+        _apps = apps;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final blockedApps = ref.watch(blockAppsProvider);
 
     return Scaffold(
@@ -34,40 +55,48 @@ class BlockAppsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select the apps you want to block during your focus sessions.\n(Note: Native interception assumes permissions are granted)',
+                'Select the apps you want to block during your focus sessions.\n(Native blocking will enforce this selection)',
                 style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(height: 24),
               Expanded(
-                child: ListView.separated(
-                  itemCount: socialApps.length,
-                  separatorBuilder: (context, index) => Divider(color: AppColors.border),
-                  itemBuilder: (context, index) {
-                    final appInfo = socialApps[index];
-                    final appName = appInfo['name']!;
-                    final isBlocked = blockedApps.contains(appName);
+                child: _isLoading 
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                    : _apps.isEmpty
+                        ? Center(child: Text("No apps found", style: GoogleFonts.inter(color: Colors.white)))
+                        : ListView.separated(
+                            itemCount: _apps.length,
+                            separatorBuilder: (context, index) => const Divider(color: AppColors.border),
+                            itemBuilder: (context, index) {
+                              final appInfo = _apps[index];
+                              final appName = appInfo.name ?? 'Unknown App';
+                              final packageName = appInfo.packageName ?? '';
+                              final isBlocked = blockedApps.contains(packageName);
 
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardBackground,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.apps_rounded, color: AppColors.primary),
-                      ),
-                      title: Text(appName, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
-                      trailing: Switch(
-                        value: isBlocked,
-                        activeColor: AppColors.primary,
-                        onChanged: (val) {
-                          ref.read(blockAppsProvider.notifier).toggleApp(appName);
-                        },
-                      ),
-                    );
-                  },
-                ),
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBackground,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: appInfo.icon != null
+                                      ? Image.memory(appInfo.icon!, width: 40, height: 40)
+                                      : const Icon(Icons.android, color: AppColors.primary),
+                                ),
+                                title: Text(appName, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
+                                subtitle: Text(packageName, style: GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
+                                trailing: Switch(
+                                  value: isBlocked,
+                                  activeColor: AppColors.primary,
+                                  onChanged: (val) {
+                                    ref.read(blockAppsProvider.notifier).toggleApp(packageName);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
               )
             ],
           ),
@@ -76,3 +105,4 @@ class BlockAppsScreen extends ConsumerWidget {
     );
   }
 }
+

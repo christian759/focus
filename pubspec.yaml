@@ -44,7 +44,8 @@ dependencies:
   google_fonts: ^8.0.2
   flutter_animate: ^4.5.2
   shared_preferences: ^2.5.5
-  flutter_dnd: ^0.1.4+1
+  app_limiter: ^0.0.1
+  installed_apps: ^1.4.3
 
 dev_dependencies:
   flutter_test:

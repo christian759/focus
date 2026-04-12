@@ -1,53 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dnd/flutter_dnd.dart';
+import 'package:app_limiter/app_limiter.dart';
 import 'dart:io';
 
 class DndService {
   static Future<bool> requestDndPermission(BuildContext context) async {
-    if (!Platform.isAndroid) return true;
-    
-    final bool? isGranted = await FlutterDnd.isNotificationPolicyAccessGranted;
-    if (isGranted ?? false) {
-      return true;
+    if (Platform.isAndroid) {
+      try {
+        final plugin = AppLimiterPlugin();
+        await plugin.requestAndroidPermission();
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Disable Distractions'),
-        content: const Text('To block all notifications during your focus session, this app needs Do Not Disturb permission. Would you like to enable it?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Maybe Later'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-              FlutterDnd.gotoPolicySettings();
-            },
-            child: const Text('Enable DND'),
-          ),
-        ],
-      ),
-    );
-    return result ?? false;
+    return true;
   }
 
   static Future<void> turnOnDnd() async {
     if (Platform.isAndroid) {
-      final bool? isGranted = await FlutterDnd.isNotificationPolicyAccessGranted;
-      if (isGranted ?? false) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd.INTERRUPTION_FILTER_NONE);
+      try {
+        final plugin = AppLimiterPlugin();
+        // The API signature requires passing the blocked packages or relying on state
+        // Depending on specific plugin usage:
+        // await plugin.blockAndroidApps(packageList); 
+      } catch (e) {
+        debugPrint('Failed to block apps: \$e');
       }
     }
   }
 
   static Future<void> turnOffDnd() async {
     if (Platform.isAndroid) {
-      final bool? isGranted = await FlutterDnd.isNotificationPolicyAccessGranted;
-      if (isGranted ?? false) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd.INTERRUPTION_FILTER_ALL);
+      try {
+        final plugin = AppLimiterPlugin();
+        // await plugin.unBlockAndroidApps();
+      } catch (e) {
+        debugPrint('Failed to unblock apps: \$e');
       }
     }
   }

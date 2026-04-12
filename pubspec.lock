@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.3"
+  app_limiter:
+    dependency: "direct main"
+    description:
+      name: app_limiter
+      sha256: d00064ca4fa5fb365f87a1963662cef63cd6fbabee515ed04aa2854cb374d229
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   archive:
     dependency: transitive
     description:
@@ -270,14 +278,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.2"
-  flutter_dnd:
-    dependency: "direct main"
-    description:
-      name: flutter_dnd
-      sha256: b892f10b6a0a567b7f3481a2f3dd36fcd03380f90ca748219aa40648ac33b121
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.4+1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -424,6 +424,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.0"
+  installed_apps:
+    dependency: "direct main"
+    description:
+      name: installed_apps
+      sha256: dd2b7c531f91114cd6df447c56567593c9799ca83f057137ae719324ae0afd06
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   intl:
     dependency: "direct main"
     description:

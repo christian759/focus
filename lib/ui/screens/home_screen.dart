@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
 import 'create_focus_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -92,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const StatsScreen()));
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
                             },
                             child: Container(
                               padding: const EdgeInsets.all(4),
