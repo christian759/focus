@@ -5,6 +5,8 @@ import 'services/hive_service.dart';
 import 'ui/screens/home_screen.dart';
 import 'features/focus/lifecycle_observer.dart';
 
+import 'ui/widgets/global_donate_button.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
@@ -45,6 +47,11 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
       title: 'Focus+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      builder: (context, child) {
+        return GlobalDonateButton(
+          child: child ?? const SizedBox(),
+        );
+      },
       home: const HomeScreen(),
     );
   }
