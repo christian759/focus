@@ -55,24 +55,24 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select the apps you want to block during your focus sessions.',
+                'Select apps to block passively. These apps are blocked in the background — no focus session needed.',
                 style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.06),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline_rounded, color: AppColors.error, size: 20),
+                    Icon(Icons.shield_rounded, color: AppColors.primary.withOpacity(0.7), size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'System Note: Native blocking currently enforces a strict protocol. Enabling "Deep Focus" will prioritize blocking major distracting apps globally.',
+                        'Passive Shield blocks selected apps in the background. Enable it from the home screen to start protecting your focus automatically.',
                         style: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
                       ),
                     ),

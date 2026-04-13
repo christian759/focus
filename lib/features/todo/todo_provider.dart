@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,12 +8,14 @@ class Todo {
   final String title;
   final bool isCompleted;
   final DateTime date;
+  final String? alarmTime; // e.g. "14:30"
 
   Todo({
     required this.id, 
     required this.title, 
     required this.date,
     this.isCompleted = false,
+    this.alarmTime,
   });
 
   Map<String, dynamic> toJson() => {
@@ -20,6 +23,7 @@ class Todo {
     'title': title, 
     'isCompleted': isCompleted,
     'date': date.toIso8601String(),
+    'alarmTime': alarmTime,
   };
 
   factory Todo.fromJson(Map<String, dynamic> json) => Todo(
@@ -27,6 +31,7 @@ class Todo {
         title: json['title'],
         isCompleted: json['isCompleted'],
         date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+        alarmTime: json['alarmTime'],
       );
 }
 
@@ -69,6 +74,24 @@ class TodoNotifier extends StateNotifier<List<Todo>> {
           title: todo.title, 
           isCompleted: !todo.isCompleted,
           date: todo.date,
+          alarmTime: todo.alarmTime,
+        );
+      }
+      return todo;
+    }).toList();
+    _saveTodos();
+  }
+
+  void setAlarm(String id, TimeOfDay time) {
+    final timeStr = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    state = state.map((todo) {
+      if (todo.id == id) {
+        return Todo(
+          id: todo.id,
+          title: todo.title,
+          isCompleted: todo.isCompleted,
+          date: todo.date,
+          alarmTime: timeStr,
         );
       }
       return todo;

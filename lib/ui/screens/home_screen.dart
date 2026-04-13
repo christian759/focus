@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
+import '../../features/dnd/passive_blocking_provider.dart';
 
 import '../../features/user/user_provider.dart';
 
@@ -33,6 +34,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userName = ref.watch(userProvider);
     final streak = ref.watch(streakProvider);
     final sessions = ref.watch(sessionHistoryProvider);
+    final passiveState = ref.watch(passiveBlockingProvider);
+
+    // Combine focus session minutes + passive blocking minutes for today
+    final focusMinutes = ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes();
+    final passiveMinutes = passiveState.todayPassiveMinutes;
+    final totalMinutesToday = focusMinutes + passiveMinutes;
 
     return Scaffold(
       body: PremiumBackground(
@@ -57,7 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ).animate().fadeIn(),
                       const SizedBox(height: 12),
                       
-                      FocusGauge(currentMinutes: ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes()),
+                      FocusGauge(currentMinutes: totalMinutesToday),
                       
                       const SizedBox(height: 20),
                       GestureDetector(
@@ -79,7 +86,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ],
                         ),
                       ).animate().fadeIn(delay: 500.ms),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 32),
+
+                      // Passive Blocking Card
+                      _buildPassiveBlockingCard(passiveState),
+                      
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -147,6 +159,123 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ).animate().scale(delay: 600.ms),
       ),
     );
+  }
+
+  Widget _buildPassiveBlockingCard(PassiveBlockingState passiveState) {
+    return GestureDetector(
+      onTap: () {
+        ref.read(passiveBlockingProvider.notifier).togglePassiveBlocking();
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: passiveState.isActive
+              ? AppColors.primary.withOpacity(0.08)
+              : AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: passiveState.isActive
+                ? AppColors.primary.withOpacity(0.4)
+                : AppColors.border,
+            width: 1,
+          ),
+          boxShadow: passiveState.isActive
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.08),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : [],
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: passiveState.isActive
+                    ? AppColors.primary.withOpacity(0.15)
+                    : Colors.white.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                passiveState.isActive ? Icons.shield_rounded : Icons.shield_outlined,
+                color: passiveState.isActive ? AppColors.primary : Colors.white54,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Passive Shield',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    passiveState.isActive
+                        ? 'Blocking distractions • ${passiveState.todayPassiveMinutes}m today'
+                        : 'Tap to block apps in the background',
+                    style: GoogleFonts.inter(
+                      color: passiveState.isActive ? AppColors.primary.withOpacity(0.7) : Colors.white38,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: passiveState.isActive
+                  ? Container(
+                      key: const ValueKey('active'),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'ON',
+                        style: GoogleFonts.inter(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      key: const ValueKey('inactive'),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'OFF',
+                        style: GoogleFonts.inter(
+                          color: Colors.white38,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0);
   }
 
   Widget _buildFocusCard(BuildContext context, String value, String title, {bool isLarge = false}) {

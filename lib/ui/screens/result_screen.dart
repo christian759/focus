@@ -19,7 +19,6 @@ class ResultScreen extends ConsumerStatefulWidget {
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
 
-
   @override
   void initState() {
     super.initState();
@@ -60,7 +59,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   Widget build(BuildContext context) {
     final focusState = ref.watch(focusProvider);
     final isSuccess = focusState.status == FocusStatus.success;
-    final accentColor = isSuccess ? AppColors.primary : AppColors.error;
+    final totalMinutes = (focusState.totalSeconds - focusState.remainingSeconds) ~/ 60;
 
     return Scaffold(
       body: PremiumBackground(
@@ -79,8 +78,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         children: [
                 const Spacer(flex: 1),
                 Icon(
-                  isSuccess ? Icons.auto_awesome : Icons.error_outline_rounded,
-                  color: accentColor,
+                  isSuccess ? Icons.auto_awesome : Icons.self_improvement_rounded,
+                  color: AppColors.primary,
                   size: 80,
                 ).animate().scale(duration: 600.ms, curve: Curves.elasticOut)
                  .then().shimmer(duration: 1.seconds),
@@ -88,7 +87,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 const SizedBox(height: 24),
                 
                 Text(
-                  isSuccess ? 'Growth achieved' : 'Session interrupted',
+                  isSuccess ? 'Growth achieved' : 'Session complete',
                   style: GoogleFonts.playfairDisplay(
                     color: Colors.white,
                     fontSize: 32,
@@ -99,13 +98,38 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 const SizedBox(height: 12),
                 
                 Text(
-                  isSuccess ? 'Your dedication is paying off.' : 'Every step counts. Reset and flow again.',
+                  isSuccess
+                      ? 'Your dedication is paying off.'
+                      : 'You focused for $totalMinutes minutes. Every step counts.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(color: Colors.white38, fontSize: 14),
                 ).animate().fadeIn(delay: 500.ms),
                 
+                const SizedBox(height: 32),
+
+                // Session time badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.timer_rounded, color: AppColors.primary, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${totalMinutes}m session',
+                        style: GoogleFonts.inter(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 600.ms).scale(),
+
                 const Spacer(flex: 1),
-  
+ 
                  const Spacer(flex: 1),
                 
                 const SizedBox(height: 40),
@@ -114,10 +138,6 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: _finish,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: isSuccess ? Colors.white : AppColors.error.withOpacity(0.1),
-                      foregroundColor: isSuccess ? Colors.black : AppColors.error,
-                    ),
                     child: const Text('Continue'),
                   ),
                 ).animate().fadeIn(delay: 700.ms),

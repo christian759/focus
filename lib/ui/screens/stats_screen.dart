@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
+import '../../features/dnd/passive_blocking_provider.dart';
 import '../../models/session.dart';
 import '../../core/theme.dart';
 import 'package:intl/intl.dart';
@@ -14,10 +15,15 @@ class StatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(sessionHistoryProvider);
+    final passiveState = ref.watch(passiveBlockingProvider);
     final totalFocusTime = sessions
         .fold(0, (sum, s) => sum + s.durationSeconds);
+    final passiveMinutes = passiveState.todayPassiveMinutes;
     
-    final successfulSessions = sessions.where((s) => s.status == SessionStatus.completed).length;
+    // Combined total: focus sessions + passive blocking time
+    final combinedTotalSeconds = totalFocusTime + (passiveMinutes * 60);
+    
+    final totalSessions = sessions.length;
     final streak = ref.watch(streakProvider).currentStreak;
 
     // Calculate daily minutes for the last 7 days
@@ -30,6 +36,11 @@ class StatsScreen extends ConsumerWidget {
           .where((s) => s.startTime.isAfter(day) && s.startTime.isBefore(dayEnd))
           .fold(0.0, (sum, s) => sum + (s.durationSeconds / 60));
     }).toList();
+
+    // Add today's passive minutes to today's bar
+    if (dailyMinutes.isNotEmpty) {
+      dailyMinutes[dailyMinutes.length - 1] += passiveMinutes.toDouble();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -47,16 +58,16 @@ class StatsScreen extends ConsumerWidget {
                 children: [
                   _MetricRow(
                     label1: 'TOTAL TIME',
-                    value1: '${totalFocusTime ~/ 3600}h ${(totalFocusTime % 3600) ~/ 60}m',
+                    value1: '${combinedTotalSeconds ~/ 3600}h ${(combinedTotalSeconds % 3600) ~/ 60}m',
                     label2: 'SESSIONS',
-                    value2: successfulSessions.toString(),
+                    value2: totalSessions.toString(),
                   ),
                   const SizedBox(height: 16),
                   _MetricRow(
                     label1: 'STREAK',
                     value1: '$streak DAYS',
-                    label2: 'COMPLETED',
-                    value2: successfulSessions.toString(),
+                    label2: 'SHIELD TIME',
+                    value2: '${passiveMinutes}m',
                   ),
                   const SizedBox(height: 24),
                   WeeklyBarChart(dailyMinutes: dailyMinutes, weekDays: weekDays),
@@ -69,7 +80,7 @@ class StatsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             sliver: SliverToBoxAdapter(
               child: Text(
-                'LOG HISTORY', 
+                'SESSION HISTORY', 
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 4, fontWeight: FontWeight.bold),
               ),
             ),
@@ -79,8 +90,9 @@ class StatsScreen extends ConsumerWidget {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final session = sessions.reversed.toList()[index];
-                final isSuccess = session.status == SessionStatus.completed;
                 final dateStr = DateFormat('MMM dd, HH:mm').format(session.startTime);
+                final durationMin = session.durationSeconds ~/ 60;
+                final durationSec = session.durationSeconds % 60;
 
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -95,12 +107,12 @@ class StatsScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: (isSuccess ? AppColors.primary : AppColors.error).withOpacity(0.1),
+                          color: AppColors.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          isSuccess ? Icons.check_rounded : Icons.close_rounded,
-                          color: isSuccess ? AppColors.primary : AppColors.error,
+                          Icons.timer_rounded,
+                          color: AppColors.primary.withOpacity(0.8),
                           size: 18,
                         ),
                       ),
@@ -109,14 +121,25 @@ class StatsScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(isSuccess ? 'Focus Session' : 'Partial Session', style: Theme.of(context).textTheme.bodyLarge),
+                            Text('Focus Session', style: Theme.of(context).textTheme.bodyLarge),
+                            const SizedBox(height: 2),
                             Text(dateStr, style: Theme.of(context).textTheme.bodySmall),
                           ],
                         ),
                       ),
-                      Text(
-                        '${session.durationSeconds ~/ 60}m',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          durationMin > 0 ? '${durationMin}m ${durationSec}s' : '${durationSec}s',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white70,
+                          ),
+                        ),
                       ),
                     ],
                   ),
