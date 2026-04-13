@@ -4,9 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/focus/session_history_provider.dart';
 import '../../features/streak/streak_provider.dart';
-import '../../features/todo/todo_provider.dart';
+
 import '../../features/user/user_provider.dart';
-import 'session_screen.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
@@ -73,7 +73,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userName = ref.watch(userProvider);
     final streak = ref.watch(streakProvider);
     final sessions = ref.watch(sessionHistoryProvider);
-    final todos = ref.watch(todoProvider);
 
     return Scaffold(
       body: PremiumBackground(
@@ -120,52 +119,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 
-                // Tabs for Todo and History
-                SliverToBoxAdapter(
-                  child: Text('To-Do List', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final todo = todos[index];
-                      return CheckboxListTile(
-                        value: todo.isCompleted,
-                        title: Text(todo.title, style: TextStyle(color: Colors.white, decoration: todo.isCompleted ? TextDecoration.lineThrough : null)),
-                        onChanged: (_) => ref.read(todoProvider.notifier).toggleTodo(todo.id),
-                        controlAffinity: ListTileControlAffinity.leading,
-                        checkColor: Colors.black,
-                        activeColor: AppColors.primary,
-                        secondary: IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.white38),
-                          onPressed: () => ref.read(todoProvider.notifier).deleteTodo(todo.id),
-                        ),
-                      );
-                    },
-                    childCount: todos.length,
-                  ),
-                ),
-                
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Add a new task...',
-                        hintStyle: const TextStyle(color: Colors.white38),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.05),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                      ),
-                      onSubmitted: (val) {
-                        ref.read(todoProvider.notifier).addTodo(val);
-                      },
-                    ),
-                  ),
-                ),
-
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),

@@ -18,25 +18,20 @@ class ResultScreen extends ConsumerStatefulWidget {
 }
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
-  final TextEditingController _controller = TextEditingController();
+
 
   @override
   void initState() {
     super.initState();
-    _turnOffDnd();
+    _handleSessionCompletion();
   }
 
-  Future<void> _turnOffDnd() async {
+  Future<void> _handleSessionCompletion() async {
     await DndService.turnOffDnd();
+    _autoSaveSession();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _saveSession() {
+  void _autoSaveSession() {
     final focusState = ref.read(focusProvider);
     final isSuccess = focusState.status == FocusStatus.success;
 
@@ -46,7 +41,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
       endTime: DateTime.now(),
       durationSeconds: focusState.totalSeconds - focusState.remainingSeconds,
       status: isSuccess ? SessionStatus.success : SessionStatus.fail,
-      outputText: _controller.text,
+      outputText: '', // Removed thought/manual text input
     );
 
     ref.read(sessionHistoryProvider.notifier).addSession(session);
@@ -54,7 +49,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     if (isSuccess) {
       ref.read(streakProvider.notifier).updateStreak();
     }
+  }
 
+  void _finish() {
     ref.read(focusProvider.notifier).reset();
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
@@ -109,40 +106,21 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 
                 const Spacer(flex: 1),
   
-                // Glassmorphic Input
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.03),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white10),
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: TextField(
-                    controller: _controller,
-                    maxLines: 2,
-                    style: GoogleFonts.inter(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'What did you achieve?',
-                      hintStyle: GoogleFonts.inter(color: Colors.white24, fontSize: 14),
-                      contentPadding: const EdgeInsets.all(16),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1),
+                 const Spacer(flex: 1),
                 
                 const SizedBox(height: 40),
                 
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: _saveSession,
+                    onPressed: _finish,
                     style: FilledButton.styleFrom(
                       backgroundColor: isSuccess ? Colors.white : AppColors.error.withOpacity(0.1),
                       foregroundColor: isSuccess ? Colors.black : AppColors.error,
                     ),
-                    child: const Text('Save session'),
+                    child: const Text('Continue'),
                   ),
-                ).animate().fadeIn(delay: 900.ms),
+                ).animate().fadeIn(delay: 700.ms),
                 const SizedBox(height: 20),
                         ],
                       ),

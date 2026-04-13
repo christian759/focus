@@ -6,6 +6,8 @@ import '../../core/theme.dart';
 import 'home_screen.dart';
 import 'stats_screen.dart';
 import 'settings_screen.dart';
+import 'tasks_screen.dart';
+import '../../features/dnd/dnd_service.dart';
 
 class MainLayoutScreen extends ConsumerStatefulWidget {
   const MainLayoutScreen({super.key});
@@ -17,8 +19,21 @@ class MainLayoutScreen extends ConsumerStatefulWidget {
 class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
   int _currentIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPermissions();
+    });
+  }
+
+  Future<void> _checkPermissions() async {
+    await DndService.requestDndPermission(context);
+  }
+
   final List<Widget> _screens = [
     const HomeScreen(),
+    const TasksScreen(),
     const StatsScreen(),
     const SettingsScreen(),
   ];
@@ -53,6 +68,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                   child: BottomNavigationBar(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
+                    type: BottomNavigationBarType.fixed,
                     currentIndex: _currentIndex,
                     onTap: (index) {
                       setState(() {
@@ -67,6 +83,10 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       BottomNavigationBarItem(
                         icon: Icon(Icons.home_rounded),
                         label: 'Home',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.checklist_rounded),
+                        label: 'Tasks',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.bar_chart_rounded),

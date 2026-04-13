@@ -8,6 +8,7 @@ import 'package:focus/core/theme.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/dnd/dnd_service.dart';
 import 'session_screen.dart';
+import '../widgets/global_donate_button.dart';
 
 class CreateFocusScreen extends ConsumerStatefulWidget {
   const CreateFocusScreen({super.key});
@@ -22,7 +23,8 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GlobalDonateButton(
+      child: Scaffold(
       body: PremiumBackground(
         child: SafeArea(
           child: LayoutBuilder(
@@ -141,6 +143,7 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
               );
             },
           ),
+        ),
         ),
       ),
     );

@@ -20,9 +20,7 @@ class DndService {
     if (Platform.isAndroid) {
       try {
         final plugin = AppLimiter();
-        // The API signature requires passing the blocked packages or relying on state
-        // Depending on specific plugin usage:
-        // await plugin.blockAndroidApps(packageList); 
+        await plugin.blocAndroidApp();
       } catch (e) {
         debugPrint('Failed to block apps: \$e');
       }
@@ -33,7 +31,7 @@ class DndService {
     if (Platform.isAndroid) {
       try {
         final plugin = AppLimiter();
-        // await plugin.unBlockAndroidApps();
+        await plugin.unblocAndroidApp();
       } catch (e) {
         debugPrint('Failed to unblock apps: \$e');
       }

@@ -7,6 +7,7 @@ import 'result_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
+import '../widgets/global_donate_button.dart';
 
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
@@ -51,7 +52,8 @@ class SessionScreen extends ConsumerWidget {
         );
         return confirmed ?? false;
       },
-      child: Scaffold(
+      child: GlobalDonateButton(
+        child: Scaffold(
         body: PremiumBackground(
           child: SafeArea(
             child: LayoutBuilder(
@@ -127,6 +129,7 @@ class SessionScreen extends ConsumerWidget {
               },
             ),
           ),
+        ),
         ),
       ),
     );
