@@ -24,7 +24,7 @@ class StrictBlockService : Service() {
     private var isOverlayDisplayed = false
     private var handler: Handler? = null
     private var runnable: Runnable? = null
-    private var blockedPackages = Set<String>()
+    private var blockedPackages = setOf<String>()
 
     companion object {
         const val CHANNEL_ID = "StrictBlockChannel"
