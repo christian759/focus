@@ -68,7 +68,7 @@ class AboutScreen extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Made with ❤️ by a solopreneur',
+                'Made with ❤️ by christian759',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: Colors.white38,

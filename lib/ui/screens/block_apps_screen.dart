@@ -15,7 +15,9 @@ class BlockAppsScreen extends ConsumerStatefulWidget {
 
 class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
   List<AppInfo> _apps = [];
+  List<AppInfo> _filteredApps = [];
   bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -23,11 +25,21 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
     _loadApps();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadApps() async {
     try {
-      final List<AppInfo> apps = await InstalledApps.getInstalledApps(true, true);
+      // false includes system apps (like YouTube)
+      final List<AppInfo> apps = await InstalledApps.getInstalledApps(false, true);
+      // Sort alphabetically
+      apps.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
       setState(() {
         _apps = apps;
+        _filteredApps = apps;
         _isLoading = false;
       });
     } catch (e) {
@@ -35,6 +47,16 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _filterApps(String query) {
+    setState(() {
+      _filteredApps = _apps
+          .where((app) =>
+              (app.name ?? '').toLowerCase().contains(query.toLowerCase()) ||
+              (app.packageName ?? '').toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -55,47 +77,41 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select apps to block passively. These apps are blocked in the background — no focus session needed.',
-                style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+                'Select apps to block passively. System apps like YouTube are now included.',
+                style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.shield_rounded, color: AppColors.primary.withOpacity(0.7), size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Passive Shield blocks selected apps in the background. Enable it from the home screen to start protecting your focus automatically.',
-                        style: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
-                      ),
-                    ),
-                  ],
+              TextField(
+                controller: _searchController,
+                onChanged: _filterApps,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search apps...',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white38),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Expanded(
                 child: _isLoading 
                     ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                    : _apps.isEmpty
+                    : _filteredApps.isEmpty
                         ? Center(child: Text("No apps found", style: GoogleFonts.inter(color: Colors.white)))
                         : ListView.separated(
-                            itemCount: _apps.length,
-                            separatorBuilder: (context, index) => const Divider(color: AppColors.border),
+                            itemCount: _filteredApps.length,
+                            separatorBuilder: (context, index) => const Divider(color: AppColors.border, height: 1),
                             itemBuilder: (context, index) {
-                              final appInfo = _apps[index];
+                              final appInfo = _filteredApps[index];
                               final appName = appInfo.name ?? 'Unknown App';
                               final packageName = appInfo.packageName ?? '';
                               final isBlocked = blockedApps.contains(packageName);
 
                               return ListTile(
-                                contentPadding: EdgeInsets.zero,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 4),
                                 leading: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
@@ -106,7 +122,7 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
                                       ? Image.memory(appInfo.icon!, width: 40, height: 40)
                                       : const Icon(Icons.android, color: AppColors.primary),
                                 ),
-                                title: Text(appName, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
+                                title: Text(appName, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
                                 subtitle: Text(packageName, style: GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
                                 trailing: Switch(
                                   value: isBlocked,
