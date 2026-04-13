@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/alarm_service.dart';
 
 class Todo {
   final String id;
@@ -86,6 +87,18 @@ class TodoNotifier extends StateNotifier<List<Todo>> {
     final timeStr = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     state = state.map((todo) {
       if (todo.id == id) {
+        // Calculate the future DateTime for the alarm
+        final alarmDate = DateTime(
+          todo.date.year,
+          todo.date.month,
+          todo.date.day,
+          time.hour,
+          time.minute,
+        );
+        
+        // Schedule the alarm
+        AlarmService.scheduleAlarm(todo.id, todo.title, alarmDate);
+
         return Todo(
           id: todo.id,
           title: todo.title,
@@ -100,6 +113,7 @@ class TodoNotifier extends StateNotifier<List<Todo>> {
   }
 
   void deleteTodo(String id) {
+    AlarmService.cancelAlarm(id);
     state = state.where((todo) => todo.id != id).toList();
     _saveTodos();
   }

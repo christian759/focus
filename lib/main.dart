@@ -4,6 +4,7 @@ import 'core/theme.dart';
 import 'services/hive_service.dart';
 import 'ui/screens/main_layout_screen.dart';
 import 'ui/screens/onboarding_screen.dart';
+import 'services/alarm_service.dart';
 import 'features/focus/lifecycle_observer.dart';
 import 'features/user/user_provider.dart';
 
@@ -12,6 +13,7 @@ import 'features/user/user_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
+  await AlarmService.init();
   
   runApp(
     const ProviderScope(
