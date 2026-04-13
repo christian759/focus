@@ -30,8 +30,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _checkUserName() {
-    final userName = ref.read(userProvider);
-    if (userName.isEmpty) {
+    final userNotifier = ref.read(userProvider.notifier);
+    if (!userNotifier.hasSeenOnboarding) {
       _showNameDialog();
     }
   }
@@ -58,8 +58,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: () {
                 if (controller.text.trim().isNotEmpty) {
                   ref.read(userProvider.notifier).setName(controller.text.trim());
-                  Navigator.pop(context);
                 }
+                ref.read(userProvider.notifier).completeOnboarding();
+                Navigator.pop(context);
               },
               child: const Text('Continue'),
             )

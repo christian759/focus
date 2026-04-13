@@ -59,45 +59,52 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
               borderRadius: BorderRadius.circular(32),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(32),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                      width: 1,
-                    ),
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
                   ),
-                  child: BottomNavigationBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    type: BottomNavigationBarType.fixed,
-                    currentIndex: currentIndex,
-                    onTap: (index) {
-                      ref.read(navigationProvider.notifier).state = index;
-                    },
-                    selectedItemColor: AppColors.primary,
-                    unselectedItemColor: Colors.white54,
-                    showSelectedLabels: false,
-                    showUnselectedLabels: false,
-                    items: const [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.home_rounded),
-                        label: 'Home',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
                       ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.checklist_rounded),
-                        label: 'Tasks',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.bar_chart_rounded),
-                        label: 'Stats',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.settings_rounded),
-                        label: 'Settings',
-                      ),
-                    ],
+                    ),
+                    child: BottomNavigationBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      type: BottomNavigationBarType.fixed,
+                      currentIndex: currentIndex,
+                      onTap: (index) {
+                        ref.read(navigationProvider.notifier).state = index;
+                      },
+                      selectedItemColor: AppColors.primary,
+                      unselectedItemColor: Colors.white54,
+                      showSelectedLabels: false,
+                      showUnselectedLabels: false,
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.home_rounded),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.checklist_rounded),
+                          label: 'Tasks',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.bar_chart_rounded),
+                          label: 'Stats',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.settings_rounded),
+                          label: 'Settings',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

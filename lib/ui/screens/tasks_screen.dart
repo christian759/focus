@@ -55,10 +55,24 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('MMMM yyyy').format(_selectedDate),
+                      style: GoogleFonts.inter(color: Colors.white54, fontSize: 14, letterSpacing: 1),
+                    ),
+                    Text(
+                      'Week view',
+                      style: GoogleFonts.inter(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ).animate().fadeIn(),
+                const SizedBox(height: 16),
                 Text(
                   'Calendar',
                   style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-                ).animate().fadeIn(),
+                ).animate().fadeIn(delay: 100.ms),
                 const SizedBox(height: 24),
                 
                 // Calendar Strip
@@ -78,13 +92,21 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           });
                         },
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOutCubic,
                           width: 65,
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.primary : AppColors.cardBackground,
+                            color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.03),
                             borderRadius: BorderRadius.circular(20),
+                            boxShadow: isSelected ? [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.3),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              )
+                            ] : [],
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1),
+                              color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
                               width: 1,
                             )
                           ),
@@ -92,20 +114,32 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
+                                DateFormat('E').format(date).toUpperCase().substring(0, 1),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.black45 : Colors.white38,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
                                 '${date.day}',
                                 style: GoogleFonts.playfairDisplay(
-                                  fontSize: 24,
+                                  fontSize: 26,
                                   color: isSelected ? Colors.black : Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(
-                                DateFormat('E').format(date).toUpperCase(),
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: isSelected ? Colors.black54 : Colors.white54,
+                              if (_isSameDay(date, DateTime.now()))
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4),
+                                  width: 4,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.black45 : AppColors.primary,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
