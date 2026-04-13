@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme.dart';
 import 'services/hive_service.dart';
 import 'ui/screens/main_layout_screen.dart';
+import 'ui/screens/onboarding_screen.dart';
 import 'features/focus/lifecycle_observer.dart';
+import 'features/user/user_provider.dart';
 
 
 
@@ -43,11 +45,13 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
 
   @override
   Widget build(BuildContext context) {
+    final hasSeenOnboarding = ref.watch(userProvider.notifier).hasSeenOnboarding;
+
     return MaterialApp(
       title: 'Focus+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const MainLayoutScreen(),
+      home: hasSeenOnboarding ? const MainLayoutScreen() : const OnboardingScreen(),
     );
   }
 }

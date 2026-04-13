@@ -10,6 +10,7 @@ import '../../features/user/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import 'create_focus_screen.dart';
+import 'streak_screen.dart';
 import '../widgets/focus_gauge.dart';
 import '../../features/navigation/navigation_provider.dart';
 
@@ -102,21 +103,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       FocusGauge(currentMinutes: ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes()),
                       
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.local_fire_department, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${streak.currentStreak} DAY STREAK',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
+                      GestureDetector(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StreakScreen())),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.local_fire_department, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${streak.currentStreak} DAY STREAK',
+                              style: GoogleFonts.inter(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ).animate().fadeIn(delay: 500.ms),
                       const SizedBox(height: 48),
                     ],
