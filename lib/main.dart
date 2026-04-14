@@ -10,11 +10,10 @@ import 'features/user/user_provider.dart';
 
 
 
-void main() async {
+import 'ui/screens/initializing_screen.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await HiveService.init();
-  await AlarmService.init();
-  
   runApp(
     const ProviderScope(
       child: FocusPlusApp(),
@@ -31,22 +30,49 @@ class FocusPlusApp extends ConsumerStatefulWidget {
 
 class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
   late LifecycleObserver _lifecycleObserver;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _lifecycleObserver = ref.read(lifecycleObserverProvider);
-    WidgetsBinding.instance.addObserver(_lifecycleObserver);
+    _initApp();
+  }
+
+  Future<void> _initApp() async {
+    try {
+      await HiveService.init();
+      await AlarmService.init();
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+          _lifecycleObserver = ref.read(lifecycleObserverProvider);
+          WidgetsBinding.instance.addObserver(_lifecycleObserver);
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    if (_isInitialized) {
+      WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        home: const InitializingScreen(),
+      );
+    }
+
     final userState = ref.watch(userProvider);
     final hasSeenOnboarding = userState.hasSeenOnboarding;
 
