@@ -66,14 +66,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 24),
-                      _buildHeader(userState.name),
+                      _buildHeader(userState.name, streak.currentStreak),
                       const SizedBox(height: 32),
                       _buildProductivityHub(totalMinutesToday, dailyGoal, streak.currentStreak),
                       const SizedBox(height: 32),
@@ -98,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildHeader(String name) {
+  Widget _buildHeader(String name, int streakCount) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -132,14 +132,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(width: 16),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border),
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const StreakScreen()),
           ),
-          child: Icon(Icons.person_outline, color: AppColors.textSecondary, size: 20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.local_fire_department_rounded, color: AppColors.primary, size: 20),
+                const SizedBox(width: 4),
+                Text(
+                  '$streakCount',
+                  style: GoogleFonts.inter(
+                    color: AppColors.primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     ).animate().fadeIn().slideX(begin: -0.1, end: 0);

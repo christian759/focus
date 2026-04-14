@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const Color background = Color(0xFF0D0D0D); // Slightly elevated black
-  static const Color primary = Color(0xFF94A684); // Muted Sage Green
-  static const Color primaryGlow = Color(0x1A94A684); // Reduced opacity glow
-  static const Color accent = Color(0xFF7A8D91); // Soft Slate Blue
+  static const Color primary = Color(0xFF00E5A0); // Vibrant Electric Teal
+  static const Color primaryGlow = Color(0x2600E5A0); // Brighter glow
+  static const Color accent = Color(0xFF00B8D4); // Vibrant Cyan
   static const Color error = Color(0xFFFF5252);
   static const Color text = Colors.white;
   static const Color textSecondary = Color(0xFFA0A0A0);

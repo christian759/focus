@@ -67,6 +67,8 @@ class FocusNotifier extends StateNotifier<FocusState> {
   void completeSession() {
     _timer?.cancel();
     _timer = null;
+    final minutes = state.totalSeconds ~/ 60;
+    AlarmService.showSessionCompleteNotification(minutes: minutes, isSuccess: true);
     state = state.copyWith(status: FocusStatus.success);
   }
 
