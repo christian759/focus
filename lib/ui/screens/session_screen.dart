@@ -33,9 +33,9 @@ class SessionScreen extends ConsumerWidget {
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.cardBackground,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: AppColors.border)),
-            title: Text('Quit session?', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
-            content: Text('Focus will be lost. Are you sure?', style: GoogleFonts.inter(color: Colors.white70)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: AppColors.border)),
+            title: Text('END SESSION?', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w800, letterSpacing: 1, fontSize: 16)),
+            content: Text('Focus progress will be lost. Are you sure?', style: GoogleFonts.inter(color: Colors.white70, fontSize: 14)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Stay focused')),
               TextButton(
@@ -66,13 +66,13 @@ class SessionScreen extends ConsumerWidget {
                         children: [
                           const Spacer(flex: 2),
                           Text(
-                            'Current focus',
-                            style: GoogleFonts.inter(color: Colors.white38, fontSize: 13, letterSpacing: 2),
+                            'CURRENT FOCUS',
+                            style: GoogleFonts.inter(color: Colors.white38, fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.bold),
                           ).animate().fadeIn(),
                           const SizedBox(height: 8),
                           Text(
-                            'Reading session',
-                            style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                            'Deep Work Session',
+                            style: GoogleFonts.inter(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.5),
                           ).animate().fadeIn(delay: 200.ms),
                           
                           const Spacer(flex: 3),
@@ -97,10 +97,11 @@ class SessionScreen extends ConsumerWidget {
                                 
                                 Text(
                                   '$minutes:$seconds',
-                                  style: GoogleFonts.playfairDisplay(
+                                  style: GoogleFonts.inter(
                                     fontSize: 64,
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -2,
                                   ),
                                 ).animate().fadeIn(delay: 400.ms),
                               ],
