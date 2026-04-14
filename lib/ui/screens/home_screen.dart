@@ -16,6 +16,7 @@ import '../../features/user/user_provider.dart';
 import '../../features/todo/todo_provider.dart';
 import 'create_focus_screen.dart';
 import 'streak_screen.dart';
+import 'session_screen.dart';
 import '../widgets/focus_gauge.dart';
 import '../widgets/premium_background.dart';
 import 'tasks_screen.dart';
