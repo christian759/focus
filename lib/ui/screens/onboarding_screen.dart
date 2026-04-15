@@ -168,7 +168,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final name = _nameController.text.trim();
     if (name.isEmpty && _currentPage == _pages.length - 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name to continue')),
+        const SnackBar(
+          content: Text('Please enter a name to continue'),
+          duration: Duration(seconds: 2),
+        ),
       );
       return;
     }

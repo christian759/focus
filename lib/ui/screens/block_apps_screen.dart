@@ -77,7 +77,9 @@ class _BlockAppsScreenState extends ConsumerState<BlockAppsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select apps to block passively. System apps like YouTube are now included.',
+                blockedApps.isEmpty 
+                    ? 'Select apps to block passively. System apps like YouTube are now included.'
+                    : 'Manage your blocked apps. System apps like YouTube are included.',
                 style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 16),

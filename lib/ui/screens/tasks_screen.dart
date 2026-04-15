@@ -156,6 +156,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                     ],
                   ),
                   behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               );
@@ -170,6 +171,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final allTodos = ref.watch(todoProvider);
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     final todos = allTodos.where((todo) => _isSameDay(todo.date, _selectedDate)).toList();
     final monthGrid = _generateMonthGrid();
 
@@ -465,8 +467,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         },
                       ),
               ),
-              // Avoid overlap with bottom nav
-              const SizedBox(height: 80),
+               // Avoid overlap with bottom nav
+              if (!isKeyboardVisible) const SizedBox(height: 80),
             ],
           ),
         ),

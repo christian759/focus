@@ -45,6 +45,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final streak = ref.watch(streakProvider);
     final passiveState = ref.watch(passiveBlockingProvider);
+    final blockedApps = ref.watch(blockAppsProvider);
     final dailyGoal = ref.watch(dailyGoalProvider);
     final userState = ref.watch(userProvider);
     final todos = ref.watch(todoProvider);
@@ -85,7 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         _buildPrioritiesSection(todayTasks),
                         const SizedBox(height: 32),
                       ],
-                      _buildPassiveBlockingCard(passiveState),
+                      _buildPassiveBlockingCard(passiveState, blockedApps.isNotEmpty),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -482,7 +483,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildPassiveBlockingCard(PassiveBlockingState passiveState) {
+  Widget _buildPassiveBlockingCard(PassiveBlockingState passiveState, bool appsSelected) {
     return GestureDetector(
       onTap: () {
         final blockedApps = ref.read(blockAppsProvider);
@@ -492,6 +493,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               content: Text('Please select apps to block in Settings first.', 
                 style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
               backgroundColor: AppColors.primary.withOpacity(0.9),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               action: SnackBarAction(
@@ -564,7 +566,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     passiveState.isActive
                         ? 'Blocking distractions • ${passiveState.todayPassiveMinutes}m today'
-                        : 'Tap to block selected apps. Go to Settings to manage blocked apps.',
+                        : appsSelected 
+                            ? 'Tap to activate Passive Shield.'
+                            : 'No apps selected. Go to Settings to choose apps to block.',
                     style: GoogleFonts.inter(
                       color: passiveState.isActive ? AppColors.primary.withOpacity(0.7) : Colors.white38,
                       fontSize: 12,

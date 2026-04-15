@@ -53,7 +53,10 @@ class SettingsScreen extends StatelessWidget {
               subtitle: 'How we handle your data',
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening privacy policy...')),
+                  const SnackBar(
+                    content: Text('Opening privacy policy...'),
+                    duration: Duration(seconds: 2),
+                  ),
                 );
               },
             ),

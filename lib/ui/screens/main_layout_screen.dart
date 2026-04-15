@@ -42,6 +42,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(navigationProvider);
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -51,65 +52,66 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
             index: currentIndex,
             children: _screens,
           ),
-          Positioned(
-            left: 24,
-            right: 24,
-            bottom: 24,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    splashColor: Colors.transparent,
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
-                      ),
+          if (!isKeyboardVisible)
+            Positioned(
+              left: 24,
+              right: 24,
+              bottom: 24,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      splashFactory: NoSplash.splashFactory,
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
                     ),
-                    child: BottomNavigationBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      type: BottomNavigationBarType.fixed,
-                      currentIndex: currentIndex,
-                      onTap: (index) {
-                        ref.read(navigationProvider.notifier).state = index;
-                      },
-                      selectedItemColor: AppColors.primary,
-                      unselectedItemColor: Colors.white54,
-                      showSelectedLabels: false,
-                      showUnselectedLabels: false,
-                      items: const [
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.home_rounded),
-                          label: 'Home',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
                         ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.checklist_rounded),
-                          label: 'Tasks',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.bar_chart_rounded),
-                          label: 'Stats',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.settings_rounded),
-                          label: 'Settings',
-                        ),
-                      ],
+                      ),
+                      child: BottomNavigationBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        type: BottomNavigationBarType.fixed,
+                        currentIndex: currentIndex,
+                        onTap: (index) {
+                          ref.read(navigationProvider.notifier).state = index;
+                        },
+                        selectedItemColor: AppColors.primary,
+                        unselectedItemColor: Colors.white54,
+                        showSelectedLabels: false,
+                        showUnselectedLabels: false,
+                        items: const [
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.home_rounded),
+                            label: 'Home',
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.checklist_rounded),
+                            label: 'Tasks',
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.bar_chart_rounded),
+                            label: 'Stats',
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.settings_rounded),
+                            label: 'Settings',
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
