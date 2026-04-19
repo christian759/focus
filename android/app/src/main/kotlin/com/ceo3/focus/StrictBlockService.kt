@@ -26,9 +26,6 @@ class StrictBlockService : Service() {
     private var runnable: Runnable? = null
     private var blockedPackages = setOf<String>()
     private var mode: String = "deep"
-    
-    private var countdownValue = 5
-    private var dismissButton: TextView? = null
 
     companion object {
         const val CHANNEL_ID = "StrictBlockChannel"
@@ -84,24 +81,6 @@ class StrictBlockService : Service() {
             subText.gravity = Gravity.CENTER
             subText.textSize = 16f
             container.addView(subText)
-
-            val spacing3 = View(this)
-            container.addView(spacing3, FrameLayout.LayoutParams(10, 80))
-
-            dismissButton = TextView(this)
-            updateCountdownButton()
-            dismissButton?.setTextColor(Color.WHITE)
-            dismissButton?.setBackgroundColor(Color.parseColor("#1AFFFFFF"))
-            dismissButton?.setPadding(60, 30, 60, 30)
-            dismissButton?.gravity = Gravity.CENTER
-            dismissButton?.setOnClickListener {
-                if (countdownValue <= 0) {
-                    hideOverlay()
-                }
-            }
-            container.addView(dismissButton)
-            
-            startCountdown()
         } else {
             val subText = TextView(this)
             subText.text = "Finish your goal first."
@@ -118,31 +97,6 @@ class StrictBlockService : Service() {
         )
         root.addView(container, lp)
         overlayView = root
-    }
-
-    private fun startCountdown() {
-        countdownValue = 5
-        val countdownHandler = Handler(Looper.getMainLooper())
-        val countdownRunnable = object : Runnable {
-            override fun run() {
-                if (countdownValue > 0) {
-                    countdownValue--
-                    updateCountdownButton()
-                    countdownHandler.postDelayed(this, 1000)
-                }
-            }
-        }
-        countdownHandler.post(countdownRunnable)
-    }
-
-    private fun updateCountdownButton() {
-        if (countdownValue > 0) {
-            dismissButton?.text = "WAIT $countdownValue..."
-            dismissButton?.alpha = 0.5f
-        } else {
-            dismissButton?.text = "I REALLY NEED TO USE THIS"
-            dismissButton?.alpha = 1.0f
-        }
     }
 
     private fun createNotificationChannel() {
@@ -219,7 +173,6 @@ class StrictBlockService : Service() {
             try {
                 windowManager?.addView(overlayView, params)
                 isOverlayDisplayed = true
-                if (mode == "doom") startCountdown()
             } catch (e: Exception) {}
         }
     }

@@ -5,6 +5,8 @@ import '../../core/theme.dart';
 import 'block_apps_screen.dart';
 import 'about_screen.dart';
 import 'app_limiter_screen.dart';
+import 'privacy_policy_screen.dart';
+import 'contact_support_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -52,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.alternate_email_rounded, 
               title: 'Contact Support', 
               subtitle: 'Get help or report a bug',
-              onTap: () => _showContactDialog(context),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ContactSupportScreen())),
             ),
             const SizedBox(height: 16),
             _buildSettingsItem(
@@ -60,14 +62,7 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.shield_outlined, 
               title: 'Privacy Policy', 
               subtitle: 'How we handle your data',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Opening privacy policy...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen())),
             ),
           ],
         ),
@@ -75,36 +70,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  void _showContactDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.cardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: AppColors.border)),
-        title: Text('Contact Us', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text('Found a bug or have a suggestion?\n\nContact us at:\nsupport@focusplus.app', style: GoogleFonts.inter(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(color: Colors.white54)),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _launchURL('https://forms.gle/focus-plus-support');
-            },
-            child: const Text('Open Help Center'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      debugPrint('Could not launch $url');
-    }
   }
 
   Widget _buildSettingsItem(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap, Color? iconColor}) {

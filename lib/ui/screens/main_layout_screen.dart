@@ -36,6 +36,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
     const HomeScreen(),
     const TasksScreen(),
     const StatsScreen(),
+    const AppLimiterScreen(),
     const SettingsScreen(),
   ];
 
@@ -100,6 +101,10 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                           BottomNavigationBarItem(
                             icon: Icon(Icons.bar_chart_rounded),
                             label: 'Stats',
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.timer_rounded),
+                            label: 'App Limits',
                           ),
                           BottomNavigationBarItem(
                             icon: Icon(Icons.settings_rounded),
