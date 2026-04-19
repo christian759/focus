@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme.dart';
 import 'block_apps_screen.dart';
 import 'about_screen.dart';
-import 'app_limiter_screen.dart';
+
 import 'privacy_policy_screen.dart';
 import 'contact_support_screen.dart';
 
@@ -32,14 +32,7 @@ class SettingsScreen extends StatelessWidget {
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BlockAppsScreen())),
             ),
             const SizedBox(height: 16),
-            _buildSettingsItem(
-              context, 
-              icon: Icons.timer, 
-              title: 'App Limits', 
-              subtitle: 'Set daily usage limits for apps',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppLimiterScreen())),
-            ),
-            const SizedBox(height: 16),
+
             _buildSettingsItem(
               context, 
               icon: Icons.info_outline_rounded, 

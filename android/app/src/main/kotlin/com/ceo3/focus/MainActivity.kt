@@ -60,16 +60,12 @@ class MainActivity : FlutterActivity() {
             val startTime = calendar.timeInMillis
             val endTime = System.currentTimeMillis()
 
-            val usageStatsList = usageStatsManager.queryUsageStats(
-                UsageStatsManager.INTERVAL_DAILY,
-                startTime,
-                endTime
-            )
+            val statsMap = usageStatsManager.queryAndAggregateUsageStats(startTime, endTime)
 
             val stats = mutableListOf<Map<String, Any>>()
-            for (usageStats in usageStatsList) {
+            for ((packageName, usageStats) in statsMap) {
                 val map = mapOf(
-                    "packageName" to usageStats.packageName,
+                    "packageName" to packageName,
                     "totalTimeInForeground" to usageStats.totalTimeInForeground,
                     "lastTimeUsed" to usageStats.lastTimeUsed
                 )

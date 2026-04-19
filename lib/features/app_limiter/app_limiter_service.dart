@@ -22,8 +22,8 @@ class AppLimiterService {
   static Future<List<Map<String, dynamic>>> getAppUsageStats() async {
     if (Platform.isAndroid) {
       try {
-        final result = await _channel.invokeMethod('getUsageStats');
-        return List<Map<String, dynamic>>.from(result);
+        final List<dynamic> result = await _channel.invokeMethod('getUsageStats');
+        return result.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       } catch (e) {
         debugPrint('Failed to get usage stats: $e');
         return [];
