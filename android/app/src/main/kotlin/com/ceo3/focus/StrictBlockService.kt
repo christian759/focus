@@ -124,6 +124,9 @@ class StrictBlockService : Service() {
         val limitSecs = intent?.getIntegerArrayListExtra("limitSeconds") ?: arrayListOf()
         limitPackages = limitPkgs.zip(limitSecs).toMap()
         
+        // Always purge the "exceeded" cache on a fresh intent to ensure any newly increased config limits are respected
+        overLimitPackages.clear()
+        
         mode = intent?.getStringExtra("mode") ?: "deep"
 
         if (overlayView == null) {

@@ -97,6 +97,14 @@ class _AppLimiterScreenState extends ConsumerState<AppLimiterScreen> {
           ],
         ),
         actions: [
+          if (existingLimit != null)
+            TextButton(
+              onPressed: () {
+                ref.read(appLimitsProvider.notifier).removeLimit(appInfo.packageName ?? '');
+                Navigator.pop(context);
+              },
+              child: const Text('Remove', style: TextStyle(color: AppColors.error)),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
