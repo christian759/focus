@@ -20,9 +20,13 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
                 "startStrictBlock" -> {
                     val packages = call.argument<List<String>>("packages")
+                    val limitPackages = call.argument<List<String>>("limitPackages")
+                    val limitSeconds = call.argument<List<Int>>("limitSeconds")
                     val mode = call.argument<String>("mode") ?: "deep"
                     val intent = Intent(this, StrictBlockService::class.java)
                     intent.putExtra("packages", packages?.toTypedArray())
+                    intent.putStringArrayListExtra("limitPackages", limitPackages?.let { ArrayList(it) })
+                    intent.putIntegerArrayListExtra("limitSeconds", limitSeconds?.let { ArrayList(it) })
                     intent.putExtra("mode", mode)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent)

@@ -25,6 +25,9 @@ class StrictBlockService : Service() {
     private var handler: Handler? = null
     private var runnable: Runnable? = null
     private var blockedPackages = setOf<String>()
+    private var limitPackages = mapOf<String, Int>()
+    private var overLimitPackages = mutableSetOf<String>()
+    private var lastUsageCheckTime = 0L
     private var mode: String = "deep"
     private var lastForegroundPackage: String? = null
     private var lastCheckTime: Long = 0L
@@ -112,6 +115,11 @@ class StrictBlockService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val packages = intent?.getStringArrayExtra("packages")?.toSet() ?: emptySet()
         blockedPackages = packages
+        
+        val limitPkgs = intent?.getStringArrayListExtra("limitPackages") ?: arrayListOf()
+        val limitSecs = intent?.getIntegerArrayListExtra("limitSeconds") ?: arrayListOf()
+        limitPackages = limitPkgs.zip(limitSecs).toMap()
+        
         mode = intent?.getStringExtra("mode") ?: "deep"
 
         if (overlayView == null) {
@@ -171,7 +179,37 @@ class StrictBlockService : Service() {
         }
         
         lastCheckTime = endTime
-        return blockedPackages.contains(lastForegroundPackage)
+        
+        val fPackage = lastForegroundPackage ?: return false
+        if (blockedPackages.contains(fPackage)) return true
+        
+        if (limitPackages.containsKey(fPackage)) {
+            if (overLimitPackages.contains(fPackage)) {
+                return true
+            }
+
+            val now = System.currentTimeMillis()
+            if (now - lastUsageCheckTime > 5000) { // Check limits every 5 seconds
+                lastUsageCheckTime = now
+                val limitSecs = limitPackages[fPackage]!!
+                val calendar = java.util.Calendar.getInstance()
+                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                calendar.set(java.util.Calendar.MINUTE, 0)
+                calendar.set(java.util.Calendar.SECOND, 0)
+                calendar.set(java.util.Calendar.MILLISECOND, 0)
+                
+                val statsMap = usageStatsManager.queryAndAggregateUsageStats(calendar.timeInMillis, now)
+                val stat = statsMap[fPackage]
+                val usedSecs = if (stat != null) (stat.totalTimeInForeground / 1000).toInt() else 0
+
+                if (usedSecs >= limitSecs) {
+                    overLimitPackages.add(fPackage)
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 
     private fun showOverlay() {

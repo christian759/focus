@@ -9,6 +9,7 @@ import '../../features/focus/focus_provider.dart';
 import '../../features/dnd/dnd_service.dart';
 import 'session_screen.dart';
 import '../../features/dnd/block_apps_provider.dart';
+import '../../features/app_limiter/app_limits_provider.dart';
 
 class CreateFocusScreen extends ConsumerStatefulWidget {
   const CreateFocusScreen({super.key});
@@ -98,7 +99,13 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                                       final granted = await DndService.requestDndPermission(context);
                                       if (granted) {
                                         final blockedApps = ref.read(blockAppsProvider);
-                                        await DndService.turnOnDnd(blockedApps, mode: 'deep');
+                                        final limits = ref.read(appLimitsProvider);
+                                        final limitsMap = {
+                                          for (var l in limits)
+                                            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
+                                              l.packageName: l.dailyLimit.inSeconds
+                                        };
+                                        await DndService.turnOnDnd(blockedApps, mode: 'deep', limitPackages: limitsMap);
                                       }
                                       ref.read(focusProvider.notifier).startSession(_selectedMinutes);
                                       if (context.mounted) {

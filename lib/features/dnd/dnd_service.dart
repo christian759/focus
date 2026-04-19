@@ -19,12 +19,14 @@ class DndService {
     return true;
   }
 
-  static Future<void> turnOnDnd(List<String> blockedPackages, {String mode = 'deep'}) async {
+  static Future<void> turnOnDnd(List<String> blockedPackages, {String mode = 'deep', Map<String, int>? limitPackages}) async {
     if (Platform.isAndroid) {
       try {
         await _channel.invokeMethod('startStrictBlock', {
           'packages': blockedPackages,
           'mode': mode,
+          if (limitPackages != null) 'limitPackages': limitPackages.keys.toList(),
+          if (limitPackages != null) 'limitSeconds': limitPackages.values.toList(),
         });
       } catch (e) {
         debugPrint('Failed to block apps: $e');
