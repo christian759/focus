@@ -11,6 +11,7 @@ import 'features/user/user_provider.dart';
 
 
 import 'ui/screens/initializing_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,7 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
     try {
       await HiveService.init();
       await AlarmService.init();
+      await MobileAds.instance.initialize();
     } catch (e) {
       debugPrint('Initialization error: $e');
     } finally {

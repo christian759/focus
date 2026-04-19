@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../features/focus/focus_provider.dart';
 import '../../features/dnd/dnd_service.dart';
 import 'result_screen.dart';
@@ -8,11 +9,53 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../widgets/premium_background.dart';
 
-class SessionScreen extends ConsumerWidget {
+class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SessionScreen> createState() => _SessionScreenState();
+}
+
+class _SessionScreenState extends ConsumerState<SessionScreen> {
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
+
+  final String _adUnitId = 'ca-app-pub-3940256099942544/6300978111'; // Google Banner Test ID
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAd();
+  }
+
+  void _loadAd() {
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded.');
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          debugPrint('BannerAd failed to load: $err');
+          ad.dispose();
+        },
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final focusState = ref.watch(focusProvider);
 
     if (focusState.status == FocusStatus.success || focusState.status == FocusStatus.failed) {
@@ -29,9 +72,9 @@ class SessionScreen extends ConsumerWidget {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        await showDialog<bool>(
+        final shouldPop = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.cardBackground,
@@ -51,6 +94,9 @@ class SessionScreen extends ConsumerWidget {
             ],
           ),
         );
+        if (shouldPop == true && context.mounted) {
+           Navigator.pop(context);
+        }
       },
       child: Scaffold(
         body: PremiumBackground(
@@ -120,7 +166,21 @@ class SessionScreen extends ConsumerWidget {
                               shape: const CircleBorder(),
                             ),
                           ).animate().fadeIn(delay: 1.seconds),
-                          const SizedBox(height: 40),
+                          
+                          const Spacer(),
+                          
+                          // AdMob Banner ad placement
+                          if (_bannerAd != null && _isAdLoaded)
+                            SafeArea(
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                width: _bannerAd!.size.width.toDouble(),
+                                height: _bannerAd!.size.height.toDouble(),
+                                child: AdWidget(ad: _bannerAd!),
+                              ).animate().fadeIn(delay: 500.ms),
+                            )
+                          else
+                            const SizedBox(height: 62), // Placeholder height
                         ],
                       ),
                     ),

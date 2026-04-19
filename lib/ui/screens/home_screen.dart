@@ -37,11 +37,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final streak = ref.watch(streakProvider);
     final passiveState = ref.watch(passiveBlockingProvider);
@@ -52,11 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final focusState = ref.watch(focusProvider);
 
     final isSessionRunning = focusState.status == FocusStatus.running;
-
-    // Filter today's incomplete tasks
     final todayTasks = todos.where((t) => !t.isCompleted).take(2).toList();
-
-    // Combine focus session minutes + passive blocking minutes for today
     final focusMinutes = ref.read(sessionHistoryProvider.notifier).getTodayFocusMinutes();
     final passiveMinutes = passiveState.todayPassiveMinutes;
     final totalMinutesToday = focusMinutes + passiveMinutes;
@@ -103,61 +94,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _getGreeting(),
-                style: GoogleFonts.inter(
-                  color: Colors.white54,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, Colors.deepPurpleAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
+              child: const CircleAvatar(
+                radius: 24,
+                backgroundColor: AppColors.background,
+                child: Icon(Icons.person, color: Colors.white70, size: 24),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getGreeting(),
+                  style: GoogleFonts.inter(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                ),
+                Text(
                   name.isNotEmpty ? name : 'Focus Friend',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
+                  style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(width: 16),
         GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const StreakScreen()),
-          ),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StreakScreen())),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.primary.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AppColors.primary.withOpacity(0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.local_fire_department_rounded, color: AppColors.primary, size: 20),
-                const SizedBox(width: 4),
-                Text(
-                  '$streakCount',
-                  style: GoogleFonts.inter(
-                    color: AppColors.primary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                const Icon(Icons.local_fire_department_rounded, color: AppColors.primary, size: 22),
+                const SizedBox(width: 6),
+                Text('$streakCount', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w800)),
               ],
             ),
           ),
@@ -170,64 +155,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return GestureDetector(
       onTap: () => _showGoalDialog(context, goal),
       child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: AppTheme.glassDecoration,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white.withOpacity(0.08), Colors.white.withOpacity(0.02)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(color: AppColors.primary.withOpacity(0.05), blurRadius: 30, spreadRadius: -5),
+          ],
+        ),
         child: Row(
           children: [
-            FocusGauge(
-              currentMinutes: current,
-              goalMinutes: goal,
-              size: 80,
-              showInfo: false,
-            ),
-            const SizedBox(width: 20),
+            FocusGauge(currentMinutes: current, goalMinutes: goal, size: 84, showInfo: false),
+            const SizedBox(width: 24),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'DAILY PROGRESS',
-                    style: GoogleFonts.inter(
-                      color: AppColors.primary.withOpacity(0.8),
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
+                    style: GoogleFonts.inter(color: AppColors.primary.withOpacity(0.9), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       '$current / $goal mins',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.local_fire_department, color: AppColors.primary, size: 14),
+                      const Icon(Icons.star_rounded, color: Colors.amberAccent, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '$streak DAY STREAK',
-                        style: GoogleFonts.inter(
-                          color: Colors.white60,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        'Great Job!',
+                        style: GoogleFonts.inter(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.white12),
+            const Icon(Icons.chevron_right, color: Colors.white24),
           ],
         ),
-      ).animate().fadeIn(delay: 200.ms).scale(begin: const Offset(0.98, 0.98), end: const Offset(1, 1)),
+      ).animate().fadeIn(delay: 200.ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
     );
   }
 
@@ -237,17 +215,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progress = state.totalSeconds > 0 ? (state.totalSeconds - state.remainingSeconds) / state.totalSeconds : 0.0;
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SessionScreen()),
-      ),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SessionScreen())),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.08),
+          gradient: LinearGradient(
+            colors: [AppColors.primary.withOpacity(0.2), AppColors.primary.withOpacity(0.05)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(32),
           border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 2),
+          boxShadow: [
+            BoxShadow(color: AppColors.primary.withOpacity(0.15), blurRadius: 20, spreadRadius: 0),
+          ]
         ),
         child: Row(
           children: [
@@ -258,14 +240,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   width: 60,
                   height: 60,
                   child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 4,
-                    color: AppColors.primary,
-                    backgroundColor: Colors.white.withOpacity(0.05),
-                    strokeCap: StrokeCap.round,
+                    value: progress, strokeWidth: 5, color: AppColors.primary, backgroundColor: Colors.white.withOpacity(0.1), strokeCap: StrokeCap.round,
                   ),
                 ),
-                Icon(Icons.timer_outlined, color: AppColors.primary, size: 20),
+                const Icon(Icons.timer_rounded, color: AppColors.primary, size: 24),
               ],
             ),
             const SizedBox(width: 20),
@@ -273,97 +251,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'SESSION IN PROGRESS',
-                    style: GoogleFonts.inter(
-                      color: AppColors.primary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
+                  Text('SESSION ACTIVE', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
                   const SizedBox(height: 4),
-                  Text(
-                    'Focusing...',
-                    style: GoogleFonts.playfairDisplay(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Deep Work', style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  '$minutes:$seconds',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'REMAINING',
-                  style: GoogleFonts.inter(
-                    color: Colors.white38,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text('$minutes:$seconds', style: GoogleFonts.inter(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                Text('REMAINING', style: GoogleFonts.inter(color: Colors.white54, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1)),
               ],
             ),
           ],
         ),
-      ).animate(onPlay: (c) => c.repeat(reverse: true))
-       .shimmer(duration: 2.seconds, color: AppColors.primary.withOpacity(0.1)),
+      ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2500.ms, color: AppColors.primary.withOpacity(0.2)),
     );
   }
 
   Widget _buildStartFocusCard() {
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const CreateFocusScreen()),
-      ),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateFocusScreen())),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(20),
+          color: AppColors.cardBackground.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(32),
           border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 25, offset: const Offset(0, 15)),
+          ],
         ),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.primary.withOpacity(0.7)],
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: AppColors.primary.withOpacity(0.4), blurRadius: 15, spreadRadius: 2)
+                ]
               ),
-              child: Icon(Icons.play_arrow_rounded, color: AppColors.primary, size: 28),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'READY TO FOCUS?',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Start a deep work session now',
-              style: GoogleFonts.inter(
-                color: Colors.white38,
-                fontSize: 12,
-              ),
-            ),
+              child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36),
+            ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(begin: const Offset(1,1), end: const Offset(1.08, 1.08), duration: 2.seconds),
+            const SizedBox(height: 20),
+            Text('READY TO DIVE IN?', style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+            const SizedBox(height: 6),
+            Text('Start a new deep work block', style: GoogleFonts.inter(color: Colors.white54, fontSize: 14)),
           ],
         ),
       ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
@@ -377,25 +316,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'TODAY\'S PRIORITIES',
-              style: GoogleFonts.inter(
-                color: Colors.white38,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-              ),
-            ),
+            Text('TODAY\'S MISSIONS', style: GoogleFonts.inter(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
             GestureDetector(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksScreen())),
-              child: Text(
-                'SEE ALL',
-                style: GoogleFonts.inter(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: Text('VIEW ALL', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -404,25 +328,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
           ),
           child: Row(
             children: [
-              Icon(Icons.radio_button_unchecked, color: AppColors.primary, size: 20),
-              const SizedBox(width: 12),
+              const Icon(Icons.radio_button_unchecked, color: AppColors.primary, size: 22),
+              const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  task.title,
-                  style: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
-                ),
+                child: Text(task.title, style: GoogleFonts.inter(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
               ),
               if (task.alarmTime != null)
-                Text(
-                  task.alarmTime!,
-                  style: GoogleFonts.inter(color: Colors.white38, fontSize: 12),
-                ),
+                Text(task.alarmTime!, style: GoogleFonts.inter(color: Colors.white38, fontSize: 12)),
             ],
           ),
         )).toList(),
@@ -436,29 +354,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.cardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: AppColors.border)),
-        title: Text('Daily Focus Goal', style: GoogleFonts.playfairDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: const BorderSide(color: AppColors.border)),
+        title: Text('Daily Focus Goal', style: GoogleFonts.playfairDisplay(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('How many minutes would you like to focus today?', 
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 14)),
-            const SizedBox(height: 24),
+            Text('Set a challenging but achievable target.', style: GoogleFonts.inter(color: Colors.white54, fontSize: 14)),
+            const SizedBox(height: 32),
             StatefulBuilder(
               builder: (context, setModalState) {
                 return Column(
                   children: [
-                    Text('$selectedGoal MINS', 
-                      style: GoogleFonts.playfairDisplay(color: AppColors.primary, fontSize: 32, fontWeight: FontWeight.bold)),
+                    Text('$selectedGoal MINS', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 36, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 16),
                     Slider(
-                      value: selectedGoal.toDouble(),
-                      min: 30,
-                      max: 480,
-                      divisions: 15,
-                      activeColor: AppColors.primary,
-                      onChanged: (val) {
-                        setModalState(() => selectedGoal = val.toInt());
-                      },
+                      value: selectedGoal.toDouble(), min: 30, max: 480, divisions: 15, activeColor: AppColors.primary,
+                      onChanged: (val) => setModalState(() => selectedGoal = val.toInt()),
                     ),
                   ],
                 );
@@ -467,16 +378,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
           FilledButton(
             onPressed: () {
               ref.read(dailyGoalProvider.notifier).setGoal(selectedGoal);
               Navigator.pop(context);
             },
-            child: const Text('Set Goal'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('Set Goal', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -486,23 +397,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildPassiveBlockingCard(PassiveBlockingState passiveState, bool appsSelected) {
     return GestureDetector(
       onTap: () {
-        final blockedApps = ref.read(blockAppsProvider);
-        if (blockedApps.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Please select apps to block in Settings first.', 
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 2),
-              backgroundColor: AppColors.primary.withOpacity(0.9),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              action: SnackBarAction(
-                label: 'SETTINGS',
-                textColor: Colors.black,
-                onPressed: () => ref.read(navigationProvider.notifier).state = 3,
-              ),
-            ),
-          );
+        if (!appsSelected) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Please select apps in Settings first.')));
           return;
         }
         ref.read(passiveBlockingProvider.notifier).togglePassiveBlocking();
@@ -510,114 +406,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: passiveState.isActive
-              ? AppColors.primary.withOpacity(0.08)
-              : AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: passiveState.isActive
-                ? AppColors.primary.withOpacity(0.4)
-                : AppColors.border,
-            width: 1,
-          ),
-          boxShadow: passiveState.isActive
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.08),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ]
-              : [],
+          color: passiveState.isActive ? AppColors.primary.withOpacity(0.08) : AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: passiveState.isActive ? AppColors.primary.withOpacity(0.4) : AppColors.border, width: 1.5),
+          boxShadow: passiveState.isActive ? [BoxShadow(color: AppColors.primary.withOpacity(0.06), blurRadius: 24, spreadRadius: 4)] : [],
         ),
         child: Row(
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              padding: const EdgeInsets.all(12),
+              duration: const Duration(milliseconds: 500),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: passiveState.isActive
-                    ? AppColors.primary.withOpacity(0.15)
-                    : Colors.white.withOpacity(0.05),
-                shape: BoxShape.circle,
+                gradient: passiveState.isActive ? LinearGradient(colors: [AppColors.primary, AppColors.primary.withOpacity(0.7)]) : null,
+                color: passiveState.isActive ? null : Colors.white.withOpacity(0.05), 
+                shape: BoxShape.circle
               ),
-              child: Icon(
-                passiveState.isActive ? Icons.shield_rounded : Icons.shield_outlined,
-                color: passiveState.isActive ? AppColors.primary : Colors.white54,
-                size: 24,
-              ),
+              child: Icon(passiveState.isActive ? Icons.shield_rounded : Icons.shield_outlined, color: passiveState.isActive ? Colors.white : Colors.white54, size: 26),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 18),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Passive Shield',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    passiveState.isActive
-                        ? 'Blocking distractions • ${passiveState.todayPassiveMinutes}m today'
-                        : appsSelected 
-                            ? 'Tap to activate Passive Shield.'
-                            : 'No apps selected. Go to Settings to choose apps to block.',
-                    style: GoogleFonts.inter(
-                      color: passiveState.isActive ? AppColors.primary.withOpacity(0.7) : Colors.white38,
-                      fontSize: 12,
-                    ),
-                  ),
+                  Text('Passive Shield', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                  const SizedBox(height: 6),
+                  Text(passiveState.isActive ? 'Guarding focus • ${passiveState.todayPassiveMinutes}m today' : appsSelected ? 'Tap to activate background shield.' : 'Choose apps from settings.', style: GoogleFonts.inter(color: passiveState.isActive ? AppColors.primary.withOpacity(0.8) : Colors.white42, fontSize: 13)),
                 ],
               ),
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: passiveState.isActive
-                  ? Container(
-                      key: const ValueKey('active'),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'ON',
-                        style: GoogleFonts.inter(
-                          color: AppColors.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      key: const ValueKey('inactive'),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'OFF',
-                        style: GoogleFonts.inter(
-                          color: Colors.white38,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
+                  ? Container(key: const ValueKey('active'), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.2), borderRadius: BorderRadius.circular(24)), child: Text('ON', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1)))
+                  : Container(key: const ValueKey('inactive'), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(24)), child: Text('OFF', style: GoogleFonts.inter(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1))),
             ),
           ],
         ),
       ),
-    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0);
+    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0);
   }
 }

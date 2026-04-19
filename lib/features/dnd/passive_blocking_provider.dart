@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dnd_service.dart';
 import 'block_apps_provider.dart';
+import '../app_limiter/app_limits_provider.dart';
+import '../../models/app_limit.dart';
 
 class PassiveBlockingState {
   final bool isActive;
@@ -37,7 +39,25 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
 
     _ref.listen<List<String>>(blockAppsProvider, (previous, next) {
       if (state.isActive) {
-        DndService.turnOnDnd(next);
+        final limits = _ref.read(appLimitsProvider);
+        final limitsMap = {
+          for (var l in limits)
+            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
+              l.packageName: l.dailyLimit.inSeconds
+        };
+        DndService.turnOnDnd(next, limitPackages: limitsMap);
+      }
+    });
+
+    _ref.listen<List<AppLimit>>(appLimitsProvider, (previous, next) {
+      if (state.isActive) {
+        final blockedApps = _ref.read(blockAppsProvider);
+        final limitsMap = {
+          for (var l in next)
+            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
+              l.packageName: l.dailyLimit.inSeconds
+        };
+        DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
       }
     });
   }
@@ -63,7 +83,13 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
       _startTracking();
       // Re-enforce blocking on reload
       final blockedApps = _ref.read(blockAppsProvider);
-      DndService.turnOnDnd(blockedApps);
+      final limits = _ref.read(appLimitsProvider);
+      final limitsMap = {
+        for (var l in limits)
+          if (l.isEnabled && l.dailyLimit.inSeconds > 0)
+            l.packageName: l.dailyLimit.inSeconds
+      };
+      DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
     }
   }
 
@@ -82,7 +108,13 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
 
   Future<void> _activate() async {
     final blockedApps = _ref.read(blockAppsProvider);
-    await DndService.turnOnDnd(blockedApps);
+    final limits = _ref.read(appLimitsProvider);
+    final limitsMap = {
+      for (var l in limits)
+        if (l.isEnabled && l.dailyLimit.inSeconds > 0)
+          l.packageName: l.dailyLimit.inSeconds
+    };
+    await DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
 
     state = state.copyWith(
       isActive: true,
