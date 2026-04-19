@@ -27,7 +27,6 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Future<void> _handleSessionCompletion() async {
-    await DndService.turnOffDnd();
     _autoSaveSession();
   }
 

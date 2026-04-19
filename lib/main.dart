@@ -12,6 +12,7 @@ import 'features/user/user_provider.dart';
 
 import 'ui/screens/initializing_screen.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'features/dnd/global_block_orchestrator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,6 +69,7 @@ class _FocusPlusAppState extends ConsumerState<FocusPlusApp> {
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userProvider);
+    ref.watch(globalBlockOrchestratorProvider);
 
     if (!_isInitialized || userState.isLoading) {
       return MaterialApp(

@@ -96,17 +96,7 @@ class _CreateFocusScreenState extends ConsumerState<CreateFocusScreen> {
                                 Expanded(
                                   child: OutlinedButton(
                                     onPressed: () async {
-                                      final granted = await DndService.requestDndPermission(context);
-                                      if (granted) {
-                                        final blockedApps = ref.read(blockAppsProvider);
-                                        final limits = ref.read(appLimitsProvider);
-                                        final limitsMap = {
-                                          for (var l in limits)
-                                            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
-                                              l.packageName: l.dailyLimit.inSeconds
-                                        };
-                                        await DndService.turnOnDnd(blockedApps, mode: 'deep', limitPackages: limitsMap);
-                                      }
+                                      await DndService.requestDndPermission(context);
                                       ref.read(focusProvider.notifier).startSession(_selectedMinutes);
                                       if (context.mounted) {
                                         Navigator.pushReplacement(

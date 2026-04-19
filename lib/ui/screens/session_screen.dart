@@ -85,7 +85,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Stay focused')),
               TextButton(
                 onPressed: () async {
-                  await DndService.turnOffDnd();
                   ref.read(focusProvider.notifier).endSessionEarly();
                   if (context.mounted) Navigator.pop(context, true);
                 },

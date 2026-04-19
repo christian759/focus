@@ -432,7 +432,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text('Passive Shield', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
                   const SizedBox(height: 6),
-                  Text(passiveState.isActive ? 'Guarding focus • ${passiveState.todayPassiveMinutes}m today' : appsSelected ? 'Tap to activate background shield.' : 'Choose apps from settings.', style: GoogleFonts.inter(color: passiveState.isActive ? AppColors.primary.withOpacity(0.8) : Colors.white42, fontSize: 13)),
+                  Text(passiveState.isActive ? 'Guarding focus • ${passiveState.todayPassiveMinutes}m today' : appsSelected ? 'Tap to activate background shield.' : 'Choose apps from settings.', style: GoogleFonts.inter(color: passiveState.isActive ? AppColors.primary.withOpacity(0.8) : Colors.white38, fontSize: 13)),
                 ],
               ),
             ),

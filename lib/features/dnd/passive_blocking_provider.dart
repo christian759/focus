@@ -36,30 +36,6 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
 
   PassiveBlockingNotifier(this._ref) : super(PassiveBlockingState()) {
     _loadState();
-
-    _ref.listen<List<String>>(blockAppsProvider, (previous, next) {
-      if (state.isActive) {
-        final limits = _ref.read(appLimitsProvider);
-        final limitsMap = {
-          for (var l in limits)
-            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
-              l.packageName: l.dailyLimit.inSeconds
-        };
-        DndService.turnOnDnd(next, limitPackages: limitsMap);
-      }
-    });
-
-    _ref.listen<List<AppLimit>>(appLimitsProvider, (previous, next) {
-      if (state.isActive) {
-        final blockedApps = _ref.read(blockAppsProvider);
-        final limitsMap = {
-          for (var l in next)
-            if (l.isEnabled && l.dailyLimit.inSeconds > 0)
-              l.packageName: l.dailyLimit.inSeconds
-        };
-        DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
-      }
-    });
   }
 
   Future<void> _loadState() async {
@@ -81,15 +57,6 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
 
     if (isActive) {
       _startTracking();
-      // Re-enforce blocking on reload
-      final blockedApps = _ref.read(blockAppsProvider);
-      final limits = _ref.read(appLimitsProvider);
-      final limitsMap = {
-        for (var l in limits)
-          if (l.isEnabled && l.dailyLimit.inSeconds > 0)
-            l.packageName: l.dailyLimit.inSeconds
-      };
-      DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
     }
   }
 
@@ -107,15 +74,6 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
   }
 
   Future<void> _activate() async {
-    final blockedApps = _ref.read(blockAppsProvider);
-    final limits = _ref.read(appLimitsProvider);
-    final limitsMap = {
-      for (var l in limits)
-        if (l.isEnabled && l.dailyLimit.inSeconds > 0)
-          l.packageName: l.dailyLimit.inSeconds
-    };
-    await DndService.turnOnDnd(blockedApps, limitPackages: limitsMap);
-
     state = state.copyWith(
       isActive: true,
       activeSince: DateTime.now(),
@@ -128,7 +86,6 @@ class PassiveBlockingNotifier extends StateNotifier<PassiveBlockingState> {
     _stopTracking();
     // Flush any remaining time
     _flushAccumulated();
-    await DndService.turnOffDnd();
 
     state = state.copyWith(isActive: false);
     await _saveState();

@@ -56,7 +56,11 @@ class StrictBlockService : Service() {
         container.gravity = Gravity.CENTER
         
         val titleView = TextView(this)
-        titleView.text = if (mode == "doom") "MINDFUL INTERVENTION" else "DEEP FOCUS ACTIVE"
+        titleView.text = when (mode) {
+            "deep" -> "DEEP FOCUS ACTIVE"
+            "passive", "doom" -> "MINDFUL INTERVENTION"
+            else -> "APP LIMIT REACHED"
+        }
         titleView.setTextColor(Color.parseColor("#64B5F6")) // Light blue accent
         titleView.textSize = 14f
         titleView.letterSpacing = 0.2f
@@ -127,7 +131,11 @@ class StrictBlockService : Service() {
         }
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(if (mode == "doom") "Anti-Doom Scrolling Active" else "Deep Focus Active")
+            .setContentTitle(when (mode) {
+                "deep" -> "Deep Focus Active"
+                "passive", "doom" -> "Passive Shield Active"
+                else -> "App Limits Active"
+            })
             .setContentText("Helping you stay focused...")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .build()
